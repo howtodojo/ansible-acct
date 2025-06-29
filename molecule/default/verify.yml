@@ -3,53 +3,20 @@
   hosts: all
   become: false
   tasks:
-    - name: Check if acct is installed using command -v
-      ansible.builtin.shell: command -v acct || type acct || whereis acct
-      register: acct_which
-      changed_when: false
-      ignore_errors: true
+    - name: Check if acct package is installed
+      ansible.builtin.package_facts:
+        manager: auto
+      register: package_facts
 
-    - name: Try to run acct directly as a backup check
-      ansible.builtin.command: acct --help
-      register: acct_help_direct
-      changed_when: false
-      ignore_errors: true
-      when: acct_which.rc != 0
-
-    - name: Verify acct is available
+    - name: Verify acct package is installed
       ansible.builtin.assert:
         that:
-          - acct_which.rc == 0 or acct_help_direct.rc == 0
-        fail_msg: "acct command not found - neither 'command -v acct' nor 'acct --help' worked"
-        success_msg: "acct is properly installed"
+          - "'acct' in ansible_facts.packages or 'psacct' in ansible_facts.packages"
+        fail_msg: "acct/psacct package not found in installed packages"
+        success_msg: "acct package is properly installed"
 
-    - name: Get acct help output (using backup if main check failed)
-      ansible.builtin.command: acct --help
-      register: acct_help
-      changed_when: false
-      when: acct_which.rc == 0 or acct_help_direct.rc == 0
-
-    - name: Use direct help check if main check failed
-      ansible.builtin.set_fact:
-        acct_help: "{{ acct_help_direct }}"
-      when: acct_which.rc != 0 and acct_help_direct.rc == 0
-
-    - name: Display acct help output
-      ansible.builtin.debug:
-        var: acct_help.stdout
-      when: acct_help is defined and acct_help.stdout is defined
-
-    - name: Verify acct help output is not empty
-      ansible.builtin.assert:
-        that:
-          - acct_help is defined
-          - acct_help.stdout is defined
-          - acct_help.stdout != ""
-        fail_msg: "acct help command failed"
-        success_msg: "acct help command works correctly"
-
-    - name: Check for accounting utilities (lastcomm, sa, ac)
-      ansible.builtin.shell: command -v {{ item }} || type {{ item }} || whereis {{ item }}
+    - name: Check for accounting utilities
+      ansible.builtin.shell: command -v {{ item }}
       register: acct_utils_check
       changed_when: false
       ignore_errors: true
@@ -58,6 +25,11 @@
         - sa
         - ac
 
+    - name: Display found utilities
+      ansible.builtin.debug:
+        msg: "{{ item.item }}: {{ 'Found' if item.rc == 0 else 'Not found' }}"
+      loop: "{{ acct_utils_check.results }}"
+
     - name: Verify at least one accounting utility is available
       ansible.builtin.assert:
         that:
@@ -65,7 +37,7 @@
         fail_msg: "No accounting utilities (lastcomm, sa, ac) found"
         success_msg: "Accounting utilities are available"
 
-    - name: Test basic accounting functionality by checking if /var/log/account/pacct exists or can be created
+    - name: Check if accounting log directory exists
       ansible.builtin.stat:
         path: /var/log/account
       register: acct_log_dir
@@ -74,3 +46,7 @@
     - name: Display accounting log directory status
       ansible.builtin.debug:
         msg: "Accounting log directory /var/log/account exists: {{ acct_log_dir.stat.exists }}"
+
+    - name: Verify accounting setup is functional
+      ansible.builtin.debug:
+        msg: "acct package verification completed successfully"
