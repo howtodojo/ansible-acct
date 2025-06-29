@@ -6,6 +6,8 @@ galaxy_info:
     license: BSD
     min_ansible_version: 2.0
     github_branch: master
+    role_name: acct
+    namespace: howtodojo
     platforms:
         - name: Ubuntu
           versions:
