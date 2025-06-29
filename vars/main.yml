@@ -1,4 +1,13 @@
 ---
 # vars file for ansible-acct
-acct_packages:
+
+# Default packages for Debian/Ubuntu
+acct_packages_debian:
   - acct
+
+# Default packages for RHEL/CentOS/AlmaLinux/Rocky Linux
+acct_packages_redhat:
+  - psacct
+
+# Set the appropriate package list based on OS family
+acct_packages: "{{ acct_packages_debian if ansible_os_family == 'Debian' else acct_packages_redhat }}"

@@ -1,7 +1,7 @@
 acct
 =========
 
-[![Build Status](https://travis-ci.org/howtodojo/ansible-acct.svg?branch=master)](https://travis-ci.org/howtodojo/ansible-acct)
+![](https://github.com/howtodojo/ansible-acct/actions/workflows/ci.yml/badge.svg)
 
 This role will install acct
 

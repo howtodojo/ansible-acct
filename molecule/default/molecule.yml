@@ -1,0 +1,60 @@
+---
+driver:
+  name: docker
+platforms:
+  # Ubuntu 22.04 LTS (Jammy) - Default
+  - name: instance-ubuntu-22
+    image: "${MOLECULE_DISTRO:-ubuntu:22.04}"
+    pre_build_image: true
+    command: /bin/bash -c "while true; do sleep 30; done"
+    tmpfs:
+      - /run
+      - /tmp
+  # Ubuntu 22.04 LTS (Jammy) - Optional, enable with MOLECULE_DISTRO=ubuntu:22.04
+  # - name: instance-ubuntu-22
+  #   image: ubuntu:22.04
+  #   pre_build_image: true
+  #   command: /bin/bash -c "while true; do sleep 30; done"
+  #   tmpfs:
+  #     - /run
+  #     - /tmp
+  # Ubuntu 24.04 LTS (Noble) - Optional, enable with MOLECULE_DISTRO=ubuntu:24.04
+  # - name: instance-ubuntu-24
+  #   image: ubuntu:24.04
+  #   pre_build_image: true
+  #   command: /bin/bash -c "while true; do sleep 30; done"
+  #   tmpfs:
+  #     - /run
+  #     - /tmp
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      instance-ubuntu-22:
+        ansible_distribution: Ubuntu
+        ansible_distribution_release: jammy
+        ansible_distribution_major_version: "22"
+        ansible_os_family: Debian
+        ansible_connection: docker
+        ansible_user: root
+        ansible_become: false
+      # Uncomment below if testing Ubuntu 22.04
+      # instance-ubuntu-22:
+      #   ansible_distribution: Ubuntu
+      #   ansible_distribution_release: jammy
+      #   ansible_distribution_major_version: "22"
+      #   ansible_os_family: Debian
+      #   ansible_connection: docker
+      #   ansible_user: root
+      #   ansible_become: false
+      # Uncomment below if testing Ubuntu 24.04
+      # instance-ubuntu-24:
+      #   ansible_distribution: Ubuntu
+      #   ansible_distribution_release: noble
+      #   ansible_distribution_major_version: "24"
+      #   ansible_os_family: Debian
+      #   ansible_connection: docker
+      #   ansible_user: root
+      #   ansible_become: false
+verifier:
+  name: ansible

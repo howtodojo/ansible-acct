@@ -1,0 +1,21 @@
+---
+- name: Converge
+  hosts: all
+  become: false
+  gather_facts: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  vars_files:
+    - ../../defaults/main.yml
+    - ../../vars/main.yml
+  pre_tasks:
+    - name: Debug system information
+      ansible.builtin.debug:
+        msg: |
+          Distribution: {{ ansible_distribution }}
+          OS Family: {{ ansible_os_family }}
+          Distribution Version: {{ ansible_distribution_version }}
+
+  tasks:
+    - name: Include role tasks
+      ansible.builtin.include_tasks: ../../tasks/main.yml

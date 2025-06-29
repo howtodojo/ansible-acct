@@ -1,0 +1,43 @@
+---
+# RHEL 10 family testing scenario - Tests against RHEL 10 compatible distributions
+driver:
+  name: docker
+platforms:
+  # AlmaLinux 10 (when available)
+  - name: instance-almalinux-10
+    image: almalinux:10
+    pre_build_image: true
+    command: /bin/bash -c "while true; do sleep 30; done"
+    tmpfs:
+      - /run
+      - /tmp
+  # Rocky Linux 10 (when available) 
+  - name: instance-rocky-10
+    image: rockylinux:10
+    pre_build_image: true
+    command: /bin/bash -c "while true; do sleep 30; done"
+    tmpfs:
+      - /run
+      - /tmp
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      instance-almalinux-10:
+        ansible_distribution: AlmaLinux
+        ansible_distribution_release: ""
+        ansible_distribution_major_version: "10"
+        ansible_os_family: RedHat
+        ansible_connection: docker
+        ansible_user: root
+        ansible_become: false
+      instance-rocky-10:
+        ansible_distribution: Rocky
+        ansible_distribution_release: ""
+        ansible_distribution_major_version: "10"
+        ansible_os_family: RedHat
+        ansible_connection: docker
+        ansible_user: root
+        ansible_become: false
+verifier:
+  name: ansible

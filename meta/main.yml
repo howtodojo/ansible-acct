@@ -8,9 +8,16 @@ galaxy_info:
   platforms:
   - name: Ubuntu
     versions:
-     - precise
-     - trusty
-     - xenial
+     - focal
+     - jammy
+     - noble
+  - name: Debian
+    versions:
+     - bookworm
+  - name: EL
+    versions:
+     - 9
+     - 10
 
   galaxy_tags:
     - monitoring
