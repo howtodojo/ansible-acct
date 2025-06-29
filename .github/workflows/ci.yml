@@ -1,0 +1,68 @@
+---
+name: CI
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install test dependencies
+        run: |
+          pip3 install ansible ansible-lint yamllint
+          
+      - name: Lint YAML files
+        run: yamllint .
+
+      - name: Lint Ansible files
+        run: ansible-lint
+
+  molecule:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - debian12
+          - ubuntu22
+          - ubuntu24
+          - almalinux9
+          - rockylinux9
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install test dependencies
+        run: |
+          pip3 install ansible
+          pip3 install "molecule>=6.0.0"
+          pip3 install "molecule-plugins[docker]>=23.0.0"
+          pip3 install docker
+
+      - name: Set up Molecule working directory
+        run: echo "MOLECULE_PROJECT_DIRECTORY=${{ github.workspace }}" >> $GITHUB_ENV
+
+      - name: Run Molecule tests
+        run: molecule -v test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro == 'debian12' && 'debian:12' || matrix.distro == 'ubuntu22' && 'ubuntu:22.04' || matrix.distro == 'ubuntu24' && 'ubuntu:24.04' || matrix.distro == 'almalinux9' && 'almalinux:9' || matrix.distro == 'rockylinux9' && 'rockylinux:9' || 'ubuntu:22.04' }}
+          MOLECULE_ANSIBLE_DISTRIBUTION: ${{ matrix.distro == 'debian12' && 'Debian' || matrix.distro == 'ubuntu22' && 'Ubuntu' || matrix.distro == 'ubuntu24' && 'Ubuntu' || matrix.distro == 'almalinux9' && 'AlmaLinux' || matrix.distro == 'rockylinux9' && 'Rocky' || 'Ubuntu' }}
+          MOLECULE_ANSIBLE_RELEASE: ${{ matrix.distro == 'debian12' && 'bookworm' || matrix.distro == 'ubuntu22' && 'jammy' || matrix.distro == 'ubuntu24' && 'noble' || matrix.distro == 'almalinux9' && '' || matrix.distro == 'rockylinux9' && '' || 'jammy' }}
+          MOLECULE_ANSIBLE_VERSION: ${{ matrix.distro == 'debian12' && '12' || matrix.distro == 'ubuntu22' && '22' || matrix.distro == 'ubuntu24' && '24' || matrix.distro == 'almalinux9' && '9' || matrix.distro == 'rockylinux9' && '9' || '22' }}
+          MOLECULE_ANSIBLE_OS_FAMILY: ${{ matrix.distro == 'debian12' && 'Debian' || matrix.distro == 'ubuntu22' && 'Debian' || matrix.distro == 'ubuntu24' && 'Debian' || matrix.distro == 'almalinux9' && 'RedHat' || matrix.distro == 'rockylinux9' && 'RedHat' || 'Debian' }}

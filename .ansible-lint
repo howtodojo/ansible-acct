@@ -1,0 +1,12 @@
+---
+exclude_paths:
+  - .github/
+  - molecule/
+  - tests/
+
+skip_list:
+  - yaml[line-length]
+  - schema[meta]
+  - fqcn[action-core]
+
+offline: true
