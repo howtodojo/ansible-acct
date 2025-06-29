@@ -1,26 +1,27 @@
+---
 galaxy_info:
-  author: Muhammad Panji
-  description: install acct
-  company: howtodojo.com
-  license: BSD
-  min_ansible_version: 2.0
-  github_branch: master
-  platforms:
-  - name: Ubuntu
-    versions:
-     - focal
-     - jammy
-     - noble
-  - name: Debian
-    versions:
-     - bookworm
-  - name: EL
-    versions:
-     - 9
-     - 10
+    author: Muhammad Panji
+    description: install acct
+    company: howtodojo.com
+    license: BSD
+    min_ansible_version: 2.0
+    github_branch: master
+    platforms:
+        - name: Ubuntu
+          versions:
+              - focal
+              - jammy
+              - noble
+        - name: Debian
+          versions:
+              - bookworm
+        - name: EL
+          versions:
+              - 9
+              - 10
 
-  galaxy_tags:
-    - monitoring
-    - acct
+    galaxy_tags:
+        - monitoring
+        - acct
 
 dependencies: []
